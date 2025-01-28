@@ -13,7 +13,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-image: url('background.jpg'); /* 背景图 */
+            background-image: url('background.jpg'); /* 本地背景图片 */
             background-size: cover;
             background-position: center;
         }
@@ -74,6 +74,21 @@
         .controls button:hover {
             background-color: #b71c1c;
         }
+        .music-control {
+            margin-top: 20px;
+        }
+        .music-control button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .music-control button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -94,7 +109,18 @@
             <button onclick="prevSlide()">上一张</button>
             <button onclick="nextSlide()">下一张</button>
         </div>
+
+        <!-- 音乐控制 -->
+        <div class="music-control">
+            <button onclick="toggleMusic()">播放/暂停音乐</button>
+        </div>
     </div>
+
+    <!-- 背景音乐 -->
+    <audio id="background-music" loop>
+        <source src="new-year-music.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放。
+    </audio>
 
     <script>
         // 轮播逻辑
@@ -122,6 +148,22 @@
 
         // 自动轮播
         setInterval(nextSlide, 3000); // 每3秒切换一次
+
+        // 音乐控制
+        const music = document.getElementById('background-music');
+
+        function toggleMusic() {
+            if (music.paused) {
+                music.play();
+            } else {
+                music.pause();
+            }
+        }
+
+        // 自动播放音乐
+        window.onload = function() {
+            music.play();
+        };
     </script>
 </body>
 </html>
