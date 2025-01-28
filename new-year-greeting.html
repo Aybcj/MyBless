@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新年祝福</title>
+    <title>新年祝福 - 年度纪念</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,69 +13,115 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            background-image: url('background.jpg'); /* 背景图 */
+            background-size: cover;
+            background-position: center;
         }
-        .greeting {
+        .container {
             text-align: center;
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
         }
         h1 {
             color: #d32f2f;
+            font-size: 2.5em;
+            margin-bottom: 20px;
         }
         p {
             font-size: 1.2em;
             color: #333;
+            margin-bottom: 20px;
         }
-        .fireworks {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .slideshow {
+            position: relative;
             width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
+            max-width: 600px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .firework {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #ffeb3b;
-            border-radius: 50%;
-            animation: explode 1s ease-out infinite;
+        .slideshow img {
+            width: 100%;
+            display: none;
+            border-radius: 10px;
         }
-        @keyframes explode {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(3);
-                opacity: 0;
-            }
+        .slideshow img.active {
+            display: block;
+            animation: fade 1.5s ease-in-out;
+        }
+        @keyframes fade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        .controls button {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+        .controls button:hover {
+            background-color: #b71c1c;
         }
     </style>
 </head>
 <body>
-    <div class="greeting">
+    <div class="container">
         <h1>新年快乐！</h1>
         <p>愿你在新的一年里，心想事成，万事如意！</p>
-    </div>
+        
+        <!-- 照片轮播 -->
+        <div class="slideshow">
+            <img src="photo1.jpg" alt="照片1" class="active">
+            <img src="photo2.jpg" alt="照片2">
+            <img src="photo3.jpg" alt="照片3">
+            <img src="photo4.jpg" alt="照片4">
+        </div>
 
-    <div class="fireworks">
-        <div class="firework" style="top: 10%; left: 20%;"></div>
-        <div class="firework" style="top: 20%; left: 50%;"></div>
-        <div class="firework" style="top: 30%; left: 80%;"></div>
-        <div class="firework" style="top: 40%; left: 10%;"></div>
-        <div class="firework" style="top: 50%; left: 70%;"></div>
-        <div class="firework" style="top: 60%; left: 30%;"></div>
-        <div class="firework" style="top: 70%; left: 90%;"></div>
-        <div class="firework" style="top: 80%; left: 40%;"></div>
+        <!-- 控制按钮 -->
+        <div class="controls">
+            <button onclick="prevSlide()">上一张</button>
+            <button onclick="nextSlide()">下一张</button>
+        </div>
     </div>
 
     <script>
-        // 你可以在这里添加更多的JavaScript代码来增强效果
+        // 轮播逻辑
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slideshow img');
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) {
+                    slide.classList.add('active');
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        // 自动轮播
+        setInterval(nextSlide, 3000); // 每3秒切换一次
     </script>
 </body>
 </html>
