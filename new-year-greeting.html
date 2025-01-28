@@ -3,28 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新年祝福 - 年度纪念</title>
+    <title>新年祝福 - 全屏烟花绽放</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            background-image: url('background.jpg'); /* 本地背景图片 */
-            background-size: cover;
-            background-position: center;
+            position: relative;
         }
         .container {
             text-align: center;
             background-color: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
             max-width: 800px;
             width: 100%;
+            z-index: 2;
+            position: relative;
         }
         h1 {
             color: #d32f2f;
@@ -89,12 +90,23 @@
         .music-control button:hover {
             background-color: #45a049;
         }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
     </style>
 </head>
 <body>
+    <!-- 烟花特效的画布 -->
+    <canvas id="fireworks"></canvas>
+
     <div class="container">
         <h1>新年快乐！</h1>
-        <p>愿你在新的一年里，心想事成，万事如意！</p>
+        <p id="blessing">愿你在新的一年里，心想事成，万事如意！</p>
         
         <!-- 照片轮播 -->
         <div class="slideshow">
@@ -102,6 +114,13 @@
             <img src="photo2.jpg" alt="照片2">
             <img src="photo3.jpg" alt="照片3">
             <img src="photo4.jpg" alt="照片4">
+            <img src="photo5.jpg" alt="照片5">
+            <img src="photo6.jpg" alt="照片6">
+            <img src="photo7.jpg" alt="照片7">
+            <img src="photo8.jpg" alt="照片8">
+            <img src="photo9.jpg" alt="照片9">
+            <img src="photo10.jpg" alt="照片10">
+            <img src="photo11.jpg" alt="照片11">
         </div>
 
         <!-- 控制按钮 -->
@@ -123,15 +142,133 @@
     </audio>
 
     <script>
+        // 烟花特效
+        const canvas = document.getElementById('fireworks');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 2 + 1;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 6,
+                    y: (Math.random() - 0.5) * 6
+                };
+                this.alpha = 1;
+                this.gravity = 0.02;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+            update() {
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.01;
+            }
+        }
+
+        class Firework {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height;
+                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                this.radius = 3;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 2,
+                    y: Math.random() * -3 - 4
+                };
+                this.gravity = 0.02;
+                this.particles = [];
+                this.exploded = false;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            update() {
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+
+                if (this.velocity.y >= 0 && !this.exploded) {
+                    this.exploded = true;
+                    this.explode();
+                }
+
+                this.particles.forEach((particle, index) => {
+                    particle.update();
+                    if (particle.alpha <= 0) {
+                        this.particles.splice(index, 1);
+                    }
+                });
+            }
+            explode() {
+                for (let i = 0; i < 100; i++) {
+                    this.particles.push(new Particle(this.x, this.y, this.color));
+                }
+            }
+        }
+
+        let fireworks = [];
+        function createFireworks() {
+            fireworks.push(new Firework());
+        }
+
+        function animateFireworks() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            fireworks.forEach((firework, index) => {
+                firework.update();
+                firework.draw();
+                firework.particles.forEach(particle => {
+                    particle.draw();
+                });
+                if (firework.particles.length === 0 && firework.exploded) {
+                    fireworks.splice(index, 1);
+                }
+            });
+            requestAnimationFrame(animateFireworks);
+        }
+
+        setInterval(createFireworks, 500); // 每 500 毫秒生成一个烟花
+        animateFireworks();
+
         // 轮播逻辑
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slideshow img');
+        const blessings = [
+            "愿你在新的一年里，心想事成，万事如意！",
+            "新年快乐，身体健康，阖家幸福！",
+            "祝你事业蒸蒸日上，财源广进！",
+            "愿幸福常伴你左右，快乐每一天！",
+            "新年新气象，愿你笑口常开！",
+            "祝你新年大吉，万事顺心！",
+            "愿你在新的一年里，梦想成真！",
+            "新年快乐，愿你平安喜乐！",
+            "祝你新年好运连连，幸福满满！",
+            "愿你在新的一年里，收获满满！",
+            "新年快乐，愿你心想事成！"
+        ];
 
         function showSlide(index) {
             slides.forEach((slide, i) => {
                 slide.classList.remove('active');
                 if (i === index) {
                     slide.classList.add('active');
+                    document.getElementById('blessing').textContent = blessings[index];
                 }
             });
         }
@@ -160,10 +297,12 @@
             }
         }
 
-        // 自动播放音乐
-        window.onload = function() {
-            music.play();
-        };
+        // 自动播放音乐（通过用户交互触发）
+        document.addEventListener('click', () => {
+            if (music.paused) {
+                music.play();
+            }
+        }, { once: true });
     </script>
 </body>
 </html>
